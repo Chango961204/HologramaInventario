@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("API inventario funcionando");
-});
+}); 
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productsRoutes);
