@@ -8,17 +8,32 @@ async function createProduct(req, res) {
       return res.status(400).json({ message: "Nombre requerido" });
     }
 
-    // 1) Crear producto
+    if (!req.user?.id) {
+      return res.status(401).json({ message: "Usuario no autenticado" });
+    }
+
+    // 🔎 Verificar que el usuario exista en esta base
+    const userExists = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+
+    if (!userExists) {
+      return res.status(400).json({
+        message: "Usuario no existe en la base de datos",
+      });
+    }
+
     const product = await prisma.product.create({
       data: {
         name,
         description: description || null,
         price: Number(price || 0),
-        createdById: req.user.id,
+        createdBy: {
+          connect: { id: req.user.id },
+        },
       },
     });
 
-    // 2) Si mandan stock inicial, se crea movimiento IN
     if (stock && Number(stock) > 0) {
       await prisma.productMovement.create({
         data: {
@@ -26,23 +41,24 @@ async function createProduct(req, res) {
           quantity: Number(stock),
           note: "Stock inicial al crear producto",
           productId: product.id,
-          userId: req.user.id,
+          user: {
+            connect: { id: req.user.id },
+          },
         },
       });
     }
 
-    // 3) Regresar producto con movimientos incluidos
-    const fullProduct = await prisma.product.findUnique({
-      where: { id: product.id },
-      include: {
-        createdBy: { select: { id: true, name: true, email: true } },
-        movements: true,
-      },
-    });
+    return res.status(201).json(product);
 
-    return res.status(201).json(fullProduct);
   } catch (error) {
     console.log(error);
+
+    if (error.code === "P2003") {
+      return res.status(400).json({
+        message: "Error de relación: usuario no válido",
+      });
+    }
+
     return res.status(500).json({ message: "Error creando producto" });
   }
 }
