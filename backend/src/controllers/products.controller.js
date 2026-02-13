@@ -12,7 +12,7 @@ async function createProduct(req, res) {
       return res.status(401).json({ message: "Usuario no autenticado" });
     }
 
-    // 🔎 Verificar que el usuario exista en esta base
+    // Verificar que el usuario exista en la base actual
     const userExists = await prisma.user.findUnique({
       where: { id: req.user.id },
     });
@@ -23,17 +23,17 @@ async function createProduct(req, res) {
       });
     }
 
+    // 1️⃣ Crear producto
     const product = await prisma.product.create({
       data: {
         name,
         description: description || null,
         price: Number(price || 0),
-        createdBy: {
-          connect: { id: req.user.id },
-        },
+        createdById: req.user.id, // ✅ correcto
       },
     });
 
+    // 2️⃣ Crear movimiento inicial si hay stock
     if (stock && Number(stock) > 0) {
       await prisma.productMovement.create({
         data: {
@@ -41,27 +41,43 @@ async function createProduct(req, res) {
           quantity: Number(stock),
           note: "Stock inicial al crear producto",
           productId: product.id,
-          user: {
-            connect: { id: req.user.id },
-          },
+          userId: req.user.id, // ✅ CORREGIDO (sin connect)
         },
       });
     }
 
-    return res.status(201).json(product);
+    // 3️⃣ Regresar producto completo
+    const fullProduct = await prisma.product.findUnique({
+      where: { id: product.id },
+      include: {
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
+        movements: true,
+      },
+    });
+
+    return res.status(201).json(fullProduct);
 
   } catch (error) {
-    console.log(error);
+    console.log("ERROR CREATE PRODUCT:", error);
 
     if (error.code === "P2003") {
       return res.status(400).json({
-        message: "Error de relación: usuario no válido",
+        message: "Error de relación en base de datos",
       });
     }
 
-    return res.status(500).json({ message: "Error creando producto" });
+    return res.status(500).json({
+      message: "Error creando producto",
+    });
   }
 }
+
+module.exports = {
+  createProduct,
+};
+
 
 //  Listar productos (TODOS ven el mismo inventario)
 async function getProducts(req, res) {
