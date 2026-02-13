@@ -6,6 +6,8 @@ const authRoutes = require("./routes/auth.routes");
 const productsRoutes = require("./routes/products.routes");
 const movementsRoutes = require("./routes/movements.routes");
 
+const PORT = process.env.PORT || 4000;
+
 const app = express();
 
 app.use(cors());
