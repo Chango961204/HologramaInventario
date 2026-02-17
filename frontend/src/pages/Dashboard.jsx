@@ -21,7 +21,7 @@ export default function Dashboard() {
             setProducts(res.data);
         } catch (err) {
             console.log(err);
-            setError("No se pudo cargar el inventario 😢");
+            setError("No se pudo cargar el inventario ");
         } finally {
             setLoadingProducts(false);
         }
@@ -57,7 +57,7 @@ export default function Dashboard() {
                                 Inventario del evento
                             </h2>
                             <p className="text-white/70 text-sm mt-1">
-                                Control rápido y sencillo (modo rave edition ⚡)
+                                Control rápido y sencillo
                             </p>
                         </div>
 
