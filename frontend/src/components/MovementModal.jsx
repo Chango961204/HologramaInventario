@@ -1,3 +1,4 @@
+import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 
 export default function MovementModal({ open, onClose, onConfirm, type }) {
@@ -6,20 +7,12 @@ export default function MovementModal({ open, onClose, onConfirm, type }) {
 
     const isIN = type === "IN";
 
-    // Evita que la pantalla se scrollee cuando el modal está abierto
     useEffect(() => {
-        if (open) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
+        if (!open) {
+            setQuantity("");
+            setNote("");
         }
-
-        return () => {
-            document.body.style.overflow = "";
-        };
     }, [open]);
-
-    if (!open) return null;
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -29,80 +22,115 @@ export default function MovementModal({ open, onClose, onConfirm, type }) {
             note,
         });
 
-        setQuantity("");
-        setNote("");
+        onClose();
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-            {/* overlay */}
-            <div
-                onClick={onClose}
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"
-            />
+        <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
+            <Dialog.Portal>
+                {/* Overlay */}
+                <Dialog.Overlay
+                    className="
+            fixed inset-0 z-50
+            bg-black/80
+            sm:bg-black/70
+            sm:backdrop-blur-sm
+            data-[state=open]:animate-in
+            data-[state=closed]:animate-out
+            data-[state=closed]:fade-out-0
+            data-[state=open]:fade-in-0
+          "
+                />
 
-            {/* modal */}
-            <form
-                onSubmit={handleSubmit}
-                className="
-          relative z-10 w-full sm:max-w-md
-          rounded-t-3xl sm:rounded-3xl
-          bg-zinc-950 border border-white/10
-          p-6 shadow-2xl
-          max-h-[85vh] overflow-y-auto
-          pb-[max(1.5rem,env(safe-area-inset-bottom))]
-        "
-            >
-                {/* barrita de arriba tipo sheet */}
-                <div className="w-12 h-1.5 rounded-full bg-white/20 mx-auto mb-4" />
+                {/* Content */}
+                <Dialog.Content
+                    className="
+            fixed z-50
+            left-1/2 top-1/2
+            w-[95vw] sm:w-full sm:max-w-md
+            -translate-x-1/2 -translate-y-1/2
+            rounded-3xl
+            bg-zinc-950 border border-white/10
+            shadow-2xl
+            p-6
+            max-h-[85vh] overflow-y-auto
+            focus:outline-none
 
-                <h3 className="text-xl font-bold text-white">
-                    {isIN ? "➕ Entrada de producto" : "➖ Venta / salida"}
-                </h3>
+            data-[state=open]:animate-in
+            data-[state=closed]:animate-out
+            data-[state=closed]:zoom-out-95
+            data-[state=open]:zoom-in-95
+            data-[state=closed]:fade-out-0
+            data-[state=open]:fade-in-0
+          "
+                >
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <Dialog.Title className="text-xl font-bold text-white">
+                                {isIN ? "➕ Entrada de producto" : "➖ Venta / salida"}
+                            </Dialog.Title>
 
-                <p className="text-sm text-white/60 mt-1">
-                    {isIN
-                        ? "Registra producto que te llegó"
-                        : "Registra producto que metiste / vendiste"}
-                </p>
+                            <Dialog.Description className="text-sm text-white/60 mt-1">
+                                {isIN
+                                    ? "Registra producto que te llegó"
+                                    : "Registra producto que metiste / vendiste"}
+                            </Dialog.Description>
+                        </div>
 
-                <div className="mt-5 space-y-3">
-                    <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        placeholder="Cantidad"
-                        className="w-full rounded-2xl bg-white/10 border border-white/10 p-3 text-white outline-none focus:ring-2 focus:ring-lime-400/30"
-                    />
-
-                    <input
-                        value={note}
-                        onChange={(e) => setNote(e.target.value)}
-                        placeholder="Nota (opcional) Ej: Llegaron 20 a las 10pm"
-                        className="w-full rounded-2xl bg-white/10 border border-white/10 p-3 text-white outline-none focus:ring-2 focus:ring-lime-400/30"
-                    />
-
-                    <div className="flex gap-2 pt-2">
-                        <button
-                            type="submit"
-                            className={`flex-1 rounded-2xl py-3 font-semibold transition ${isIN
-                                    ? "bg-lime-400 text-black hover:bg-lime-300"
-                                    : "bg-cyan-400 text-black hover:bg-cyan-300"
-                                }`}
-                        >
-                            Confirmar
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="flex-1 rounded-2xl py-3 font-semibold bg-white/10 text-white hover:bg-white/15 transition"
-                        >
-                            Cancelar
-                        </button>
+                        {/* Close */}
+                        <Dialog.Close asChild>
+                            <button
+                                type="button"
+                                className="rounded-2xl px-3 py-2 bg-white/10 text-white hover:bg-white/15 transition"
+                            >
+                                ✕
+                            </button>
+                        </Dialog.Close>
                     </div>
-                </div>
-            </form>
-        </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="mt-5 space-y-3">
+                        <input
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            placeholder="Cantidad"
+                            className="w-full rounded-2xl bg-white/10 border border-white/10 p-3 text-white outline-none focus:ring-2 focus:ring-lime-400/30"
+                            required
+                            min={1}
+                        />
+
+                        <input
+                            value={note}
+                            onChange={(e) => setNote(e.target.value)}
+                            placeholder="Nota (opcional) Ej: Llegaron 20 a las 10pm"
+                            className="w-full rounded-2xl bg-white/10 border border-white/10 p-3 text-white outline-none focus:ring-2 focus:ring-lime-400/30"
+                        />
+
+                        <div className="flex gap-2 pt-2">
+                            <button
+                                type="submit"
+                                className={`flex-1 rounded-2xl py-3 font-semibold transition ${isIN
+                                        ? "bg-lime-400 text-black hover:bg-lime-300"
+                                        : "bg-cyan-400 text-black hover:bg-cyan-300"
+                                    }`}
+                            >
+                                Confirmar
+                            </button>
+
+                            <Dialog.Close asChild>
+                                <button
+                                    type="button"
+                                    className="flex-1 rounded-2xl py-3 font-semibold bg-white/10 text-white hover:bg-white/15 transition"
+                                >
+                                    Cancelar
+                                </button>
+                            </Dialog.Close>
+                        </div>
+                    </form>
+                </Dialog.Content>
+            </Dialog.Portal>
+        </Dialog.Root>
     );
 }
