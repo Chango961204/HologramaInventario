@@ -1,36 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MovementModal({ open, onClose, onConfirm, type }) {
     const [quantity, setQuantity] = useState("");
     const [note, setNote] = useState("");
 
-    if (!open) return null;
-
     const isIN = type === "IN";
+
+    // Evita que la pantalla se scrollee cuando el modal está abierto
+    useEffect(() => {
+        if (open) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [open]);
+
+    if (!open) return null;
 
     async function handleSubmit(e) {
         e.preventDefault();
+
         await onConfirm({
             quantity: Number(quantity),
             note,
         });
+
         setQuantity("");
         setNote("");
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pb-24 sm:pb-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
             {/* overlay */}
             <div
                 onClick={onClose}
                 className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"
-            ></div>
+            />
 
             {/* modal */}
             <form
                 onSubmit={handleSubmit}
-                className="relative z-10 w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl bg-zinc-950 border border-white/10 p-6 shadow-2xl max-h-[85vh] overflow-y-auto"
+                className="
+          relative z-10 w-full sm:max-w-md
+          rounded-t-3xl sm:rounded-3xl
+          bg-zinc-950 border border-white/10
+          p-6 shadow-2xl
+          max-h-[85vh] overflow-y-auto
+          pb-[max(1.5rem,env(safe-area-inset-bottom))]
+        "
             >
+                {/* barrita de arriba tipo sheet */}
+                <div className="w-12 h-1.5 rounded-full bg-white/20 mx-auto mb-4" />
+
                 <h3 className="text-xl font-bold text-white">
                     {isIN ? "➕ Entrada de producto" : "➖ Venta / salida"}
                 </h3>
