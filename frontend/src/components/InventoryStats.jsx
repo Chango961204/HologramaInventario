@@ -17,10 +17,10 @@ export default function InventoryStats({ products }) {
             </div>
 
             {/* stock */}
-            <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-5 shadow-xl">
+           {/*  <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-5 shadow-xl">
                 <p className="text-white/60 text-sm">Stock total</p>
                 <p className="text-white text-3xl font-black mt-1">{totalStock}</p>
-            </div>
+            </div> */}
 
             {/* valor */}
             <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-5 shadow-xl">

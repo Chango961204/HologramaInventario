@@ -4,6 +4,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
 import ProductHistory from "../pages/ProductHistory";
+import PosPage from "../pages/PosPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -32,6 +33,15 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProductHistory />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/pos"
+        element={
+          <ProtectedRoute>
+            <PosPage />
           </ProtectedRoute>
         }
       />

@@ -70,7 +70,7 @@ export default function ProductForm({ onCreated }) {
         <div className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-5 shadow-2xl hover:bg-white/15 transition">
             <h3 className="text-xl font-black text-white">Nuevo producto</h3>
             <p className="text-sm text-white/60 mt-1">
-                Agrega un producto al inventario del rave
+                Agrega un producto al Inventario
             </p>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-3">

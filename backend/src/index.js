@@ -28,6 +28,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/movements", movementsRoutes);
+app.use("/api/pos-products", require("./routes/posProducts.routes"));
+app.use("/api/sales", require("./routes/sales.routes"));
 
 app.listen(PORT, () => {
   console.log("API corriendo en puerto", PORT);
