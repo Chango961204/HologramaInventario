@@ -1,10 +1,11 @@
 import { useAuth } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [open, setOpen] = useState(false);
 
     function handleLogout() {
         logout();
@@ -13,7 +14,7 @@ export default function Navbar() {
 
     return (
         <div className="sticky top-0 z-50 bg-black/30 backdrop-blur-xl border-b border-white/10">
-            <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+            <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
 
                 {/* LEFT */}
                 <div className="flex items-center gap-8">
@@ -26,7 +27,7 @@ export default function Navbar() {
                         </p>
                     </div>
 
-                    {/* NAV LINKS */}
+                    {/* DESKTOP NAV */}
                     <div className="hidden md:flex gap-2">
                         <NavLink
                             to="/dashboard"
@@ -56,18 +57,53 @@ export default function Navbar() {
 
                 {/* RIGHT */}
                 <div className="flex items-center gap-3">
+
+                    {/* USER INFO (hidden on very small screens) */}
                     <div className="text-right hidden sm:block">
                         <p className="text-sm font-semibold text-white">{user?.name}</p>
                         <p className="text-xs text-white/60">{user?.role}</p>
                     </div>
 
+                    {/* LOGOUT */}
                     <button
                         onClick={handleLogout}
                         className="rounded-xl bg-white text-black px-4 py-2 text-sm font-bold hover:bg-white/90 transition"
                     >
                         Salir
                     </button>
+
+                    {/* MOBILE MENU BUTTON */}
+                    <button
+                        className="md:hidden text-white text-2xl"
+                        onClick={() => setOpen(!open)}
+                    >
+                        ☰
+                    </button>
                 </div>
             </div>
-        </div>);
+
+            {/* MOBILE MENU */}
+            {open && (
+                <div className="md:hidden bg-black/90 border-t border-white/10 px-4 py-4 flex flex-col gap-3">
+
+                    <NavLink
+                        to="/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="text-white font-semibold"
+                    >
+                        Inventario
+                    </NavLink>
+
+                    <NavLink
+                        to="/pos"
+                        onClick={() => setOpen(false)}
+                        className="text-white font-semibold"
+                    >
+                        Punto de Venta
+                    </NavLink>
+
+                </div>
+            )}
+        </div>
+    );
 }

@@ -44,7 +44,7 @@ export default function PosPage() {
                             Punto de Venta
                         </h2>
                         <p className="text-white/70 text-sm">
-                            Venta rápida estilo bar
+                            Venta 
                         </p>
                     </div>
 
