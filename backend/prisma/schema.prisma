@@ -26,6 +26,8 @@ model User {
   // Relación inversa (movimientos hechos por este usuario)
   movements ProductMovement[]
 
+  sales Sale[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -63,4 +65,40 @@ model ProductMovement {
 
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
+}
+
+model PosProduct {
+  id     String  @id @default(uuid())
+  name   String
+  price  Float
+  active Boolean @default(true)
+
+  saleItems SaleItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sale {
+  id        String   @id @default(uuid())
+  total     Float
+  createdAt DateTime @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  items SaleItem[]
+}
+
+model SaleItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  subtotal Float
+
+  saleId String
+  sale   Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  posProductId String
+  posProduct   PosProduct @relation(fields: [posProductId], references: [id])
 }
